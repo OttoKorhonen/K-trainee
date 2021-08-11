@@ -8,10 +8,10 @@ from flask.globals import request
 #CORS(app)
 
 
-app = Flask(__name__, static_url_path='', static_folder='frontend/build')
+app = Flask(__name__, static_url_path='/', static_folder='../frontend/build')
 app.config['CORS_HEADERS'] = 'Content-Type', 'Access-Control-Allow-Origin'
 
-with open("../data/products.json") as data:
+with open("server/data/products.json") as data:
     data = json.load(data)
 
 
@@ -20,6 +20,10 @@ shoppingData = {
 
     ]
 }
+
+@app.route("/")
+def index():
+    return app.send_static_file("index.html")
 
 
 @app.route("/api/products")
