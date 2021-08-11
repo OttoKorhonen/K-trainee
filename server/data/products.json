@@ -1,0 +1,33 @@
+{"Products":[
+        {
+            "id":123,
+            "name":"Power drill",
+            "price":125.5,
+            "stock": "In stock"
+        },
+        {
+            "id":234,
+            "name":"First aid kit",
+            "price":13.5,
+            "stock": "In stock"
+        },
+        {
+            "id":345,
+            "name":"Nails",
+            "price":5.5,
+            "stock": "In stock"
+        },
+        {
+            "id":456,
+            "name":"Hammer",
+            "price":10.0,
+            "stock": "In stock"
+        },
+        {
+            "id":567,
+            "name":"Shovel",
+            "price":20.90,
+            "stock": "Out of stock"
+        }
+    ]
+}
