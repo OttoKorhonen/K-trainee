@@ -32,7 +32,7 @@ def products():
     return data
 
 
-@app.route("/shoppingcart", methods=['GET'])
+@app.route("/api/shoppingcart", methods=['GET'])
 @cross_origin()
 def shoppingcart():
     return shoppingData
