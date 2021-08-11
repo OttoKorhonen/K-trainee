@@ -25,8 +25,10 @@ function App() {
     getData()
   }, [])
 
+  //url for development and local use
+  //http://127.0.0.1:5000/api/products"
   const getData = () => {
-    fetch("http://127.0.0.1:5001/api/products")
+    fetch("https://k-trainee.herokuapp.com/api/products")
       .then(response => response.json())
       .then(responseData => {
         console.log(responseData.Products)
@@ -34,13 +36,13 @@ function App() {
       })
       .catch(err => console.error(err))
   }
-
-  
+  //url for development and local use
+  //"http://127.0.0.1:5001/api/shoppingcart"
   const addToCart = (product) =>{
     console.log({name:product.name, price:product.price})
     let amount = items +1
     setItems(amount)
-    fetch("http://127.0.0.1:5001/api/shoppingcart",
+    fetch("https://k-trainee.herokuapp.com/api/shoppingcart",
     {
         method: 'POST', 
         headers: {
@@ -76,7 +78,7 @@ function App() {
                   <td>{product.name}</td>
                   <td>{product.price}</td>
                   <td>{product.stock}</td>
-                  <AddShoppingCartIcon onClick={() => {addToCart(product)}}  style={{paddingLeft:30, paddingRight: 30}}/>
+                 <td><AddShoppingCartIcon onClick={() => {addToCart(product)}}  style={{paddingLeft:30, paddingRight: 30}}/></td>
                 </tr>)
             }
           </tbody>

@@ -3,8 +3,12 @@ from flask_cors import CORS, cross_origin
 import json
 from flask.globals import request
 
-app = Flask(__name__)
-CORS(app)
+#These are commented out for production
+#app = Flask(__name__)
+#CORS(app)
+
+
+app = Flask(__name__, static_url_path='', static_folder='frontend/build')
 app.config['CORS_HEADERS'] = 'Content-Type', 'Access-Control-Allow-Origin'
 
 with open("../data/products.json") as data:
@@ -39,5 +43,4 @@ def get_data_from_front():
     return shoppingData
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+
