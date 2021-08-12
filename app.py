@@ -1,4 +1,3 @@
-from types import resolve_bases
 from flask import Flask, session, jsonify
 import json
 from flask.globals import request
@@ -27,7 +26,6 @@ def products():
 
 
 @app.route("/api/shoppingcart", methods=['GET'])
-#tällä hetkellä shoppingcart palauttaa vain tuotteen idn ja kappalemäärän
 def shoppingcart():
     result = {
         "products": [],
@@ -50,8 +48,7 @@ def shoppingcart():
 
 
 @app.route("/api/shoppingcart", methods=['POST'])
-#muuta nimi
-def storeData():
+def add_item_in_cart():
 
     result = {
         "products": [],
@@ -63,9 +60,9 @@ def storeData():
     newItem = request.get_json()
     try:
         new_product = get_product(newItem["id"])
-        #jos tuote on korissa ja siihen lisätään samaa tuotetta lisää
-        #kori ei osaa ottaa huomioon aikaisempia tuotteita
-        #apumuuttuja countille
+        # jos tuote on korissa ja siihen lisätään samaa tuotetta lisää
+        # kori ei osaa ottaa huomioon aikaisempia tuotteita
+        # apumuuttuja countille
         currentCart[new_product["id"]] = newItem.get("count", 1)
         session["shoppingcart"] = currentCart
     except ValueError:
