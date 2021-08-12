@@ -1,7 +1,6 @@
 from flask import Flask, session, jsonify
 import json
 from flask.globals import request
-import datetime
 
 app = Flask(__name__)
 app.secret_key="liik3deef0equo7vieng9weim8geeJ"
@@ -11,20 +10,26 @@ def openData():
         data = json.load(data)
     return data
 
-def checkData(object:dict):
-    data = openData()
-    productNames = []
-    for productName in data["Products"]:
-        productNames.append(productName["name"])
+# def checkData(object:dict):
+#     data = openData()
+#     productNames = []
+#     for productName in data["Products"]:
+#         productNames.append(productName["name"])
 
-    try:
-        if object["name"] in productNames and object["name"] != "Shovel":
-            return True
-        else:
-            raise ValueError
-    except ValueError:
-        print("Ooops!... Object name not allowed or it is out of stock")
-        
+#     try:
+#         if object["name"] in productNames and object["name"] != "Shovel":
+#             return True
+#         else:
+#             raise ValueError
+#     except ValueError:
+#         print("Ooops!... Object name not allowed or it is out of stock")
+
+def get_product(id:int):
+    data = openData()
+    for product in data["Products"]:
+        if id == int(product["id"]):
+            return product
+    raise ValueError("Id not found")
 
 
 @app.route("/api/products")
@@ -39,18 +44,14 @@ def shoppingcart():
 
 @app.route("/api/shoppingcart", methods=['POST'])
 def storeData():
-    #tässä luetaan mitä käyttäjä haluaa lisätä koriin ja tarkistaa mitä korissa jo on
-    #lisättävä tuote löytyy tuotelistalta
-    session["shoppingcart"] = []
-    requestedData = request.get_json()
-    shoppingData = requestedData
     
-    if checkData(shoppingData):
-        session["shoppingcart"].append(shoppingData)
-        print(session["shoppingcart"])
-        return {"ef":shoppingData}
-    else:
-        return "Given object not allowed"
+    currentCart = session.get("shoppingcart", [])
+    newItem = request.get_json()
+    currentCart.append(newItem)
+    session["shoppingcart"] = currentCart
+    return jsonify(session["shoppingcart"])
+    
+
 
 
 """
