@@ -1,9 +1,11 @@
+from types import resolve_bases
 from flask import Flask, session, jsonify
 import json
 from flask.globals import request
 
 app = Flask(__name__)
-app.secret_key="liik3deef0equo7vieng9weim8geeJ"
+app.secret_key = "liik3deef0equo7vieng9weim8geeJ"
+
 
 def openData():
     with open("server/data/products.json") as data:
@@ -24,7 +26,8 @@ def openData():
 #     except ValueError:
 #         print("Ooops!... Object name not allowed or it is out of stock")
 
-def get_product(id:int):
+
+def get_product(id: int):
     data = openData()
     for product in data["Products"]:
         if id == int(product["id"]):
@@ -44,14 +47,37 @@ def shoppingcart():
 
 @app.route("/api/shoppingcart", methods=['POST'])
 def storeData():
-    
-    currentCart = session.get("shoppingcart", [])
-    newItem = request.get_json()
-    currentCart.append(newItem)
-    session["shoppingcart"] = currentCart
-    return jsonify(session["shoppingcart"])
-    
 
+    result = {
+        "products": [],
+        "total": 0,
+        "status": "Success"
+    }
+    currentCart = session.get("shoppingcart", {})
+
+    newItem = request.get_json()
+    try:
+        new_product = get_product(newItem["id"])
+        #jos tuote on korissa ja siihen lisätään samaa tuotetta lisää
+        #kori ei osaa ottaa huomioon aikaisempia tuotteita
+        currentCart[new_product["id"]] = newItem.get("count", 1)
+        session["shoppingcart"] = currentCart
+    except ValueError:
+        result["status"] = "Product not found"
+    except KeyError:
+        result["status"] = "Product id couldn't be found"
+
+    total = 0
+
+    for productId in currentCart:
+        p = get_product(productId)
+        p["count"] = currentCart[productId]
+        result["products"].append(p)
+        total += p["price"] * p["count"]
+
+    result["total"] = total
+
+    return jsonify(result)
 
 
 """
