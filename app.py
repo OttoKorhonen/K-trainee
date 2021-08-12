@@ -1,50 +1,58 @@
-from flask import Flask
-from flask_cors import CORS, cross_origin
+from flask import Flask, session, jsonify
 import json
 from flask.globals import request
+import datetime
 
-#These are commented out for production
-#app = Flask(__name__)
-#CORS(app)
+app = Flask(__name__)
+app.secret_key="liik3deef0equo7vieng9weim8geeJ"
 
+def openData():
+    with open("server/data/products.json") as data:
+        data = json.load(data)
+    return data
 
-app = Flask(__name__, static_url_path='/', static_folder='../frontend/build')
-app.config['CORS_HEADERS'] = 'Content-Type', 'Access-Control-Allow-Origin'
+def checkData(object:dict):
+    data = openData()
+    productNames = []
+    for productName in data["Products"]:
+        productNames.append(productName["name"])
 
-with open("server/data/products.json") as data:
-    data = json.load(data)
-
-
-shoppingData = {
-    "shoppingcart": [
-
-    ]
-}
-
-@app.route("/")
-def index():
-    return app.send_static_file("index.html")
+    try:
+        if object["name"] in productNames and object["name"] != "Shovel":
+            return True
+        else:
+            raise ValueError
+    except ValueError:
+        print("Ooops!... Object name not allowed or it is out of stock")
+        
 
 
 @app.route("/api/products")
-@cross_origin()
 def products():
-    return data
+    return openData()
 
 
 @app.route("/api/shoppingcart", methods=['GET'])
-@cross_origin()
 def shoppingcart():
-    return shoppingData
+    return jsonify(session.get("shoppingcart", []))
 
 
 @app.route("/api/shoppingcart", methods=['POST'])
-@cross_origin()
-def get_data_from_front():
+def storeData():
+    #tässä luetaan mitä käyttäjä haluaa lisätä koriin ja tarkistaa mitä korissa jo on
+    #lisättävä tuote löytyy tuotelistalta
+    session["shoppingcart"] = []
     requestedData = request.get_json()
-    dataToJson = json.dumps(requestedData, indent=4, sort_keys=True)
-    shoppingData["shoppingcart"].append(dataToJson)
-    return shoppingData
+    shoppingData = requestedData
+    
+    if checkData(shoppingData):
+        session["shoppingcart"].append(shoppingData)
+        print(session["shoppingcart"])
+        return {"ef":shoppingData}
+    else:
+        return "Given object not allowed"
 
 
-
+"""
+curl -X POST http://127.0.0.1:5000/api/shoppingcart -H 'Content-Type: application/json' -d '{"login":"my_login","password":"my_password"}'
+   """
