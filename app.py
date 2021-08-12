@@ -12,20 +12,6 @@ def openData():
         data = json.load(data)
     return data
 
-# def checkData(object:dict):
-#     data = openData()
-#     productNames = []
-#     for productName in data["Products"]:
-#         productNames.append(productName["name"])
-
-#     try:
-#         if object["name"] in productNames and object["name"] != "Shovel":
-#             return True
-#         else:
-#             raise ValueError
-#     except ValueError:
-#         print("Ooops!... Object name not allowed or it is out of stock")
-
 
 def get_product(id: int):
     data = openData()
@@ -37,15 +23,34 @@ def get_product(id: int):
 
 @app.route("/api/products")
 def products():
-    return openData()
+    return jsonify(openData())
 
 
 @app.route("/api/shoppingcart", methods=['GET'])
+#tällä hetkellä shoppingcart palauttaa vain tuotteen idn ja kappalemäärän
 def shoppingcart():
-    return jsonify(session.get("shoppingcart", []))
+    result = {
+        "products": [],
+        "total": 0,
+        "status": "Success"
+    }
+    currentCart = session.get("shoppingcart", {})
+
+    total = 0
+
+    for productId in currentCart:
+        p = get_product(int(productId))
+        p["count"] = currentCart[productId]
+        result["products"].append(p)
+        total += p["price"] * p["count"]
+
+    result["total"] = total
+
+    return jsonify(result)
 
 
 @app.route("/api/shoppingcart", methods=['POST'])
+#muuta nimi
 def storeData():
 
     result = {
@@ -60,6 +65,7 @@ def storeData():
         new_product = get_product(newItem["id"])
         #jos tuote on korissa ja siihen lisätään samaa tuotetta lisää
         #kori ei osaa ottaa huomioon aikaisempia tuotteita
+        #apumuuttuja countille
         currentCart[new_product["id"]] = newItem.get("count", 1)
         session["shoppingcart"] = currentCart
     except ValueError:
@@ -70,7 +76,7 @@ def storeData():
     total = 0
 
     for productId in currentCart:
-        p = get_product(productId)
+        p = get_product(int(productId))
         p["count"] = currentCart[productId]
         result["products"].append(p)
         total += p["price"] * p["count"]
