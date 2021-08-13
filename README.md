@@ -17,7 +17,7 @@ After installing python, install Flask. Run in Ubuntu terminal the following lin
 >pip3 install Flask
 
 ### How to run this program?
-To run this program, open terminal and navigate to the directory where you have set the program folder. In the program folder you will find app.py file. To start the server type in the terminal 
+To run this program, open terminal and navigate to the directory where you have set the program folder. In the program folder you will find app.py file. To start the server type in the terminal: 
 
 >flask run
 
@@ -33,6 +33,7 @@ If you have postman installed on your machine you can test this program by makin
  
  By typing the following command in terminal: 
  >curl -i --cookie cookie.txt --cookie-jar cookie.txt http://127.0.0.1:5000/api/shoppingcart 
+ 
  you can GET shopping cart data. 
  
  To POST type: 
