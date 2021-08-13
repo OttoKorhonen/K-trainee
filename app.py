@@ -37,10 +37,10 @@ def shoppingcart():
     total = 0
 
     for productId in currentCart:
-        p = get_product(int(productId))
-        p["count"] = currentCart[productId]
-        result["products"].append(p)
-        total += p["price"] * p["count"]
+        p_id = get_product(int(productId))
+        p_id["count"] = currentCart[productId]
+        result["products"].append(p_id)
+        total += p_id["price"] * p_id["count"]
 
     result["total"] = total
 
@@ -55,16 +55,20 @@ def add_item_in_cart():
         "total": 0,
         "status": "Success"
     }
+
     currentCart = session.get("shoppingcart", {})
 
     newItem = request.get_json()
+
     try:
         new_product = get_product(newItem["id"])
-        # jos tuote on korissa ja siihen lisätään samaa tuotetta lisää
-        # kori ei osaa ottaa huomioon aikaisempia tuotteita
-        # apumuuttuja countille
-        currentCart[new_product["id"]] = newItem.get("count", 1)
-        session["shoppingcart"] = currentCart
+        count = newItem.get("count")
+        if count > 0:
+            currentCart[new_product["id"]] = newItem.get("count", count)
+            session["shoppingcart"] = currentCart
+        else:
+            pass
+
     except ValueError:
         result["status"] = "Product not found"
     except KeyError:
@@ -81,8 +85,3 @@ def add_item_in_cart():
     result["total"] = total
 
     return jsonify(result)
-
-
-"""
-curl -X POST http://127.0.0.1:5000/api/shoppingcart -H 'Content-Type: application/json' -d '{"login":"my_login","password":"my_password"}'
-   """
