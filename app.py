@@ -6,14 +6,14 @@ app = Flask(__name__)
 app.secret_key = "liik3deef0equo7vieng9weim8geeJ"
 
 
-def openData():
+def open_data():
     with open("server/data/products.json") as data:
         data = json.load(data)
     return data
 
 
 def get_product(id: int):
-    data = openData()
+    data = open_data()
     for product in data["Products"]:
         if id == int(product["id"]):
             return product
@@ -22,7 +22,7 @@ def get_product(id: int):
 
 @app.route("/api/products")
 def products():
-    return jsonify(openData())
+    return jsonify(open_data())
 
 
 @app.route("/api/shoppingcart", methods=['GET'])
@@ -32,13 +32,13 @@ def shoppingcart():
         "total": 0,
         "status": "Success"
     }
-    currentCart = session.get("shoppingcart", {})
+    current_cart = session.get("shoppingcart", {})
 
     total = 0
 
-    for productId in currentCart:
+    for productId in current_cart:
         p_id = get_product(int(productId))
-        p_id["count"] = currentCart[productId]
+        p_id["count"] = current_cart[productId]
         result["products"].append(p_id)
         total += p_id["price"] * p_id["count"]
 
@@ -56,16 +56,16 @@ def add_item_in_cart():
         "status": "Success"
     }
 
-    currentCart = session.get("shoppingcart", {})
+    current_cart = session.get("shoppingcart", {})
 
-    newItem = request.get_json()
+    new_Item = request.get_json()
 
     try:
-        new_product = get_product(newItem["id"])
-        count = newItem.get("count")
+        new_product = get_product(new_Item["id"])
+        count = int(new_Item.get("count", 1))
         if count > 0:
-            currentCart[new_product["id"]] = newItem.get("count", count)
-            session["shoppingcart"] = currentCart
+            current_cart[new_product["id"]] = count
+            session["shoppingcart"] = current_cart
         else:
             pass
 
@@ -76,9 +76,9 @@ def add_item_in_cart():
 
     total = 0
 
-    for productId in currentCart:
+    for productId in current_cart:
         p = get_product(int(productId))
-        p["count"] = currentCart[productId]
+        p["count"] = current_cart[productId]
         result["products"].append(p)
         total += p["price"] * p["count"]
 
