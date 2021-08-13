@@ -64,7 +64,7 @@ def add_item_in_cart():
         new_product = get_product(new_Item["id"])
         count = int(new_Item.get("count", 1))
         if count > 0:
-            current_cart[new_product["id"]] = count
+            current_cart[str(new_product["id"])] = count
             session["shoppingcart"] = current_cart
         else:
             pass
